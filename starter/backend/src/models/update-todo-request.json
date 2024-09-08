@@ -8,7 +8,15 @@
         },
         "dueDate": {
             "type": "string"
+        },
+        "done": {
+            "type": "boolean"
         }
     },
+    "required": [
+        "name",
+        "dueDate",
+        "done"
+    ],
     "additionalProperties": false
 }

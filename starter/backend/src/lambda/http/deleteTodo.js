@@ -1,13 +1,13 @@
 import middy from '@middy/core'
-import cors from '@middy/http-cors'
+import httpCors from '@middy/http-cors'
 import httpErrorHandler from '@middy/http-error-handler'
 import { deleteTodo } from '../../businessLogic/todos.mjs'
 
+const logger = createLogger('api/deleteTodo')
 export const handler = middy()
   .use(httpErrorHandler())
   .use(
-    cors({
-      origin: "*",
+    httpCors({
       credentials: true
     })
   )
@@ -15,6 +15,7 @@ export const handler = middy()
   const todoId = event.pathParameters.todoId
   
   // TODO: Remove a TODO item by id
+  logger.info(`Deleting todo with Id: ${todoId}`)
   await deleteTodo(todoId)
   return todoId
 })

@@ -3,6 +3,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { v4 as uuidv4 } from 'uuid'
 import { getTodo } from '../../businessLogic/todos.mjs'
 import { createImage } from '../../businessLogic/images.mjs'
+import httpCors from '@middy/http-cors'
 
 const bucketName = process.env.IMAGES_S3_BUCKET
 const urlExpiration = parseInt(process.env.SIGNED_URL_EXPIRATION)
@@ -12,8 +13,7 @@ const s3Client = new S3Client()
 export const handler = middy()
   .use(httpErrorHandler())
   .use(
-    cors({
-      origin: "*",
+    httpCors({
       credentials: true
     })
   )

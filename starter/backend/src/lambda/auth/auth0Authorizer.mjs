@@ -63,10 +63,9 @@ export async function handler(event) {
 
 async function verifyToken(authHeader) {
   const token = getToken(authHeader)
-  const jwt = jsonwebtoken.decode(token, { complete: true })
 
   // TODO: Implement token verification
-  return jsonwebtoken.verify(jwt, certificate, { algorithms: ['RS256'] })
+  return jsonwebtoken.verify(token, certificate, { algorithms: ['RS256'] })
 }
 
 function getToken(authHeader) {

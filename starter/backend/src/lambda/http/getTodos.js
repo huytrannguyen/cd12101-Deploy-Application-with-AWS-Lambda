@@ -1,19 +1,19 @@
 import middy from '@middy/core'
-import cors from '@middy/http-cors'
+import httpCors from '@middy/http-cors'
 import httpErrorHandler from '@middy/http-error-handler'
 import { getAllTodos } from '../../businessLogic/todos.mjs'
 
+const logger = createLogger('api/getTodos')
 export const handler = middy()
   .use(httpErrorHandler())
   .use(
-    cors({
+    httpCors({
       origin: "*",
       credentials: true
     })
   )
   .handler(async (event) => {
-    console.log('Processing event: ', event)
-
+    logger.info("Getting all todos")
     const todos = await getAllTodos()
 
     return {

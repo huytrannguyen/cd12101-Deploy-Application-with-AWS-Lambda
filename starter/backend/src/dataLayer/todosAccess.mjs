@@ -32,7 +32,7 @@ export class TodoAccess {
     const todo = await this.dynamoDbClient.get({
         TableName: todosTable,
         Key: {
-          id: todoId
+          todoId: todoId
         }
     })
     return todo
@@ -42,7 +42,7 @@ export class TodoAccess {
     await this.dynamoDbClient.delete({
         TableName: this.todosTable,
         Key: {
-          id: todoId
+          todoId: todoId
         }
     })
     return todoId
@@ -52,9 +52,17 @@ export class TodoAccess {
     await this.dynamoDbClient.put({
         TableName: this.todosTable,
         Key: {
-            id: todoId
+            todoId: todoId
         },
-        Item: body
+        UpdateExpression: "SET #n = :name, dueDate = :dueDate, done = :done",
+        ExpressionAttributeNames: {
+          "#n": "name"
+        },
+        ExpressionAttributeValues: {
+          ":name": updatedTodo.name,
+          ":dueDate": updatedTodo.dueDate,
+          ":done": updatedTodo.done,
+        },
     })
 
     return body

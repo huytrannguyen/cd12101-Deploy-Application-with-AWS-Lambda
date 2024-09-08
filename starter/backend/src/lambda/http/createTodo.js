@@ -1,25 +1,24 @@
 import middy from '@middy/core'
-import cors from '@middy/http-cors'
+import httpCors from '@middy/http-cors'
 import httpErrorHandler from '@middy/http-error-handler'
 import { getUserId } from '../utils.mjs'
 import { createTodo } from '../../businessLogic/todos.mjs'
 
+const logger = createLogger('api/createTodo')
+
 export const handler = middy()
   .use(httpErrorHandler())
   .use(
-    cors({
-      origin: "*",
+    httpCors({
       credentials: true
     })
   )
   .handler(async (event) => {
   const newTodo = JSON.parse(event.body)
-
-  const authorization = event.headers.Authorization
-  const userId = getUserId(authorization)
+  const userId = getUserId(event)
 
   // TODO: Implement creating a new TODO item
-
+  logger.info(`Creating new Todo item for user ${userId}`)
   await createTodo(newTodo, userId)
 
   return {
@@ -28,7 +27,7 @@ export const handler = middy()
       'Access-Control-Allow-Origin': '*'
     },
     body: JSON.stringify({
-      newTodo
+      item: newTodo
     })
   }
 })
