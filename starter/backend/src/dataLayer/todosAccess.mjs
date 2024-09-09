@@ -5,17 +5,19 @@ import AWSXRay from 'aws-xray-sdk-core'
 export class TodoAccess {
   constructor(
     documentClient = AWSXRay.captureAWSv3Client(new DynamoDB()),
-    todosTable = process.env.TODOS_TABLE
+    todosTable = process.env.TODOS_TABLE,
+    todosCreatedAtIndex = process.env.TODOS_CREATED_AT_INDEX
   ) {
     this.documentClient = documentClient
     this.todosTable = todosTable
     this.dynamoDbClient = DynamoDBDocument.from(this.documentClient)
+    this.todosCreatedAtIndex = todosCreatedAtIndex
   }
 
-  async getAllTodos() {
+  async getAllTodos(userId) {
     const result = await this.dynamoDbClient.query({
-      TableName: todosTable,
-      IndexName: todosCreatedAtIndex,
+      TableName: this.todosTable,
+      IndexName: this.todosCreatedAtIndex,
       KeyConditionExpression: "userId = :userId",
       ExpressionAttributeValues: {
         ":userId": userId,
@@ -33,40 +35,32 @@ export class TodoAccess {
     return todo
   }
 
-  async getTodo(todoId) {
-    const todo = await this.dynamoDbClient.get({
-        TableName: todosTable,
-        Key: {
-          todoId: todoId
-        }
-    })
-    return todo
-  }
-
-  async deleteTodo(todoId) {
+  async deleteTodo(userId, todoId) {
     await this.dynamoDbClient.delete({
         TableName: this.todosTable,
         Key: {
+          userId: userId,
           todoId: todoId
         }
     })
     return todoId
   }
 
-  async updateTodo(todoId, body) {
-    await this.dynamoDbClient.put({
+  async updateTodo(userId, todoId, body) {
+    await this.dynamoDbClient.update({
         TableName: this.todosTable,
         Key: {
-            todoId: todoId
+            todoId: todoId,
+            userId: userId
         },
         UpdateExpression: "SET #n = :name, dueDate = :dueDate, done = :done",
         ExpressionAttributeNames: {
           "#n": "name"
         },
         ExpressionAttributeValues: {
-          ":name": updatedTodo.name,
-          ":dueDate": updatedTodo.dueDate,
-          ":done": updatedTodo.done,
+          ":name": body.name,
+          ":dueDate": body.dueDate,
+          ":done": body.done,
         },
     })
 
