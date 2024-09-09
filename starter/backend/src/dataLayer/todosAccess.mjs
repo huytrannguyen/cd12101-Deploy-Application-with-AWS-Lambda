@@ -13,9 +13,14 @@ export class TodoAccess {
   }
 
   async getAllTodos() {
-    const result = await this.dynamoDbClient.scan({
-      TableName: this.todosTable
-    })
+    const result = await this.dynamoDbClient.query({
+      TableName: todosTable,
+      IndexName: todosCreatedAtIndex,
+      KeyConditionExpression: "userId = :userId",
+      ExpressionAttributeValues: {
+        ":userId": userId,
+      },
+    });
     return result.Items
   }
 
